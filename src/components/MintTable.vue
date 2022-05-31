@@ -63,10 +63,7 @@ export default {
             const txs = await ctr.queryFilter('Transfer', lstart, lend)
             this.lastLoadBlk = lend
             for(let i in txs){
-                if(txs[i].transactionHash in this.mtxs){
-                    continue
-                }
-                this.mtxs.push(txs[i])
+                this.mtxs[txs[i].transactionHash] = txs[i]
             }
             lstart = lend
         }
