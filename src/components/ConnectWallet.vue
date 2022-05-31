@@ -11,7 +11,7 @@
       v-else
       @click="connect_wallet"
       class="connect"
-      :loading="connect_loading"
+      v-loading="connect_loading"
     >
         Connect Wallet
     </el-button>

@@ -1,13 +1,21 @@
 <template>
-  <el-col id="mints">
-    <el-button type="primary" v-if="bsc" @click="load">Load History</el-button>
-    <span>{{lastLoadBlk}}</span>
+  <el-card id="mints">
+    <div slot='header' class='clearfix'>
+      <span>Mint Summary List</span>
+    </div>
+    <el-col :span='4'>
+      <el-button type="primary" v-loading='loading' v-if="bsc" @click="load">Load History</el-button>
+    </el-col>
+    <el-col :span='4'>
+        <el-tag type='info'>Sync to block {{lastLoadBlk}}</el-tag>
+    </el-col>
     <el-table :data='minthist' strip border style="width: 95%">
-        <el-table-column prop="addr" label="Address" width="420" />
+        <el-table-column type='index' width='50' />
+        <el-table-column prop="addr" label="Address" />
         <el-table-column prop="sumval" label="Amount" width="250" />
         <el-table-column prop="times" label="Times" width="100" />
     </el-table>
-  </el-col>
+  </el-card>
 </template>
 <script>
 import { mapState } from "vuex";
@@ -50,7 +58,7 @@ export default {
           minthist[i].sumval = ethers.utils.formatUnits(minthist[i].amount, this.decimals)
       }
       this.minthist = minthist;
-      console.log('minthist', minthist)
+      this.loading = false;
     },
     load_mints: async function(provider, ctr, startblk, endblk){
         const stepMax = 5000
