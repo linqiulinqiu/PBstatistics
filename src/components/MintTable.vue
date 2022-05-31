@@ -3,8 +3,8 @@
     <el-button type="primary" v-if="bsc" @click="load">Load History</el-button>
     <span>{{lastLoadBlk}}</span>
     <el-table :data='minthist' strip border style="width: 95%">
-        <el-table-column prop="addr" label="Address" width="300" />
-        <el-table-column prop="amount" label="Amount" width="250" />
+        <el-table-column prop="addr" label="Address" width="420" />
+        <el-table-column prop="sumval" label="Amount" width="250" />
         <el-table-column prop="times" label="Times" width="100" />
     </el-table>
   </el-col>
@@ -24,15 +24,19 @@ export default {
           minthist: [],
           mtxs: {},
           loading: false,
+          decimals: 0,
           startBlk: 18267035,
           lastLoadBlk: 0
       }
   },
   methods: {
     load: async function () {
+      const ctr = this.bsc.ctrs.wxcc
       this.loading = true;
-      const mints = await this.load_mints(this.bsc.provider, this.bsc.ctrs.wxcc, this.startBlk)
-      console.log('mints', mints)
+      if(!this.decimals){
+          this.decimals = await ctr.decimals()
+      }
+      const mints = await this.load_mints(this.bsc.provider, ctr, this.startBlk)
       const minthist = []
       for(var k in mints){
         minthist.push(mints[k])
@@ -42,7 +46,11 @@ export default {
           if(a.amount.lt(b.amount)) return 1;
           return 0;
       })
+      for(let i in minthist){
+          minthist[i].sumval = ethers.utils.formatUnits(minthist[i].amount, this.decimals)
+      }
       this.minthist = minthist;
+      console.log('minthist', minthist)
     },
     load_mints: async function(provider, ctr, startblk, endblk){
         const stepMax = 5000
