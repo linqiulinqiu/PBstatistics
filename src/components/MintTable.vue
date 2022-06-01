@@ -2,6 +2,7 @@
   <el-card id="mints">
     <div slot='header' class='clearfix'>
       <span>Mint Summary List</span>
+      <span>Block Range: {{ startBlk }} --- {{ endBlk }}</span>
     </div>
     <el-col :span='4'>
       <el-button type="primary" v-loading='loading' v-if="bsc" @click="load">Load History</el-button>
@@ -36,7 +37,8 @@ export default {
           mtxs: {},
           loading: false,
           decimals: 0,
-          startBlk: 18267035,
+          startBlk: 18267021,
+          endBlk: 18439821,
           lastLoadBlk: 0,
           userPos: 'Unknown'
       }
@@ -48,7 +50,7 @@ export default {
       if(!this.decimals){
           this.decimals = await ctr.decimals()
       }
-      const mints = await this.load_mints(this.bsc.provider, ctr, this.startBlk)
+      const mints = await this.load_mints(this.bsc.provider, ctr, this.startBlk, this.endBlk)
       const minthist = []
       for(var k in mints){
         minthist.push(mints[k])
@@ -78,8 +80,9 @@ export default {
     },
     load_mints: async function(provider, ctr, startblk, endblk){
         const stepMax = 5000
-        if(!endblk){
-            endblk = await provider.getBlockNumber()
+        const curblk = await provider.getBlockNumber()
+        if(!endblk || curblk<endblk){
+            endblk = curblk
         }
         let mints = {}
 
@@ -99,7 +102,6 @@ export default {
             }
             lstart = lend
         }
-
         for(let i in this.mtxs){
             const tx = this.mtxs[i]
             if(tx.args.from!=ethers.constants.AddressZero){
