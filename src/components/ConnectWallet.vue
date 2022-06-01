@@ -1,7 +1,8 @@
 <template>
   <el-col id="connect">
     <span v-if="bsc" style="color: #fff" class="baddr font">
-      <el-tooltip effect="light" placement="bottom">
+      <el-tooltip effect="light" placement="bottom" :content="bsc.addr">
+        <!-- <span slot="content">{{ bsc.addr }}</span> -->
         <el-button class="font">
           {{ addr }}
         </el-button>
@@ -13,13 +14,13 @@
       class="connect"
       v-loading="connect_loading"
     >
-        Connect Wallet
+      Connect Wallet
     </el-button>
   </el-col>
 </template>
 <script>
 import { mapState } from "vuex";
-import pbw from 'pbwallet';
+import pbw from "pbwallet";
 
 export default {
   name: "ConnectWallet",
@@ -27,10 +28,12 @@ export default {
     bsc: "bsc",
     addr: function (state) {
       if (state.bsc.addr) {
-        return state.bsc.addr.substr(0, 6) + "..." + state.bsc.addr.substr(-4, 4);
+        return (
+          state.bsc.addr.substr(0, 6) + "..." + state.bsc.addr.substr(-4, 4)
+        );
       }
       return false;
-    }
+    },
   }),
   data() {
     return {
