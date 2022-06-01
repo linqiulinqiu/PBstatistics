@@ -9,7 +9,10 @@
     <el-col :span='4'>
         <el-tag type='info'>Sync to block {{lastLoadBlk}}</el-tag>
     </el-col>
-    <el-table :data='minthist' strip border style="width: 95%">
+    <el-col :span='8'>
+        <el-tag type='success'>Your Position: {{ userPos }}</el-tag>
+    </el-col>
+    <el-table :data='minthist' strip border style="width: 95%" ref='minthist' highlight-current-row>
         <el-table-column type='index' width='50' />
         <el-table-column prop="addr" label="Address" />
         <el-table-column prop="sumval" label="Amount" width="250" />
@@ -34,7 +37,8 @@ export default {
           loading: false,
           decimals: 0,
           startBlk: 18267035,
-          lastLoadBlk: 0
+          lastLoadBlk: 0,
+          userPos: 'Unknown'
       }
   },
   methods: {
@@ -54,10 +58,22 @@ export default {
           if(a.amount.lt(b.amount)) return 1;
           return 0;
       })
+      let crow = -1
       for(let i in minthist){
+          console.log(minthist[i].addr, this.bsc.addr)
+          if(minthist[i].addr==this.bsc.addr){
+              crow = i
+          }
           minthist[i].sumval = ethers.utils.formatUnits(minthist[i].amount, this.decimals)
       }
       this.minthist = minthist;
+      console.log('crow', crow)
+      if(crow>=0){
+          this.$refs.minthist.setCurrentRow(minthist[crow])
+          this.userPos = parseInt(crow)+1
+      }else{
+          this.userPos = 'None'
+      }
       this.loading = false;
     },
     load_mints: async function(provider, ctr, startblk, endblk){
