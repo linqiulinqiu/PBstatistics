@@ -1,124 +1,141 @@
 <template>
   <el-card id="mints">
-    <div slot='header' class='clearfix'>
+    <div slot="header" class="clearfix">
       <span>Mint Summary List</span>
       <span>Block Range: {{ startBlk }} --- {{ endBlk }}</span>
     </div>
-    <el-col :span='4'>
-      <el-button type="primary" v-loading='loading' v-if="bsc" @click="load">Load History</el-button>
+    <el-col :span="4">
+      <el-button type="primary" v-loading="loading" v-if="bsc" @click="load"
+        >Load History</el-button
+      >
     </el-col>
-    <el-col :span='4'>
-        <el-tag type='info'>Sync to block {{lastLoadBlk}}</el-tag>
+    <el-col :span="4">
+      <el-tag type="info">Sync to block {{ lastLoadBlk }}</el-tag>
     </el-col>
-    <el-col :span='8'>
-        <el-tag type='success'>Your Position: {{ userPos }}</el-tag>
+    <el-col :span="8">
+      <el-tag type="success">Your Position: {{ userPos }}</el-tag>
     </el-col>
-    <el-table :data='minthist' strip border style="width: 95%" ref='minthist' highlight-current-row>
-        <el-table-column type='index' width='50' />
-        <el-table-column prop="addr" label="Address" />
-        <el-table-column prop="sumval" label="Amount" width="250" />
-        <el-table-column prop="times" label="Times" width="100" />
+    <el-table
+      class="font"
+      :data="minthist"
+      strip
+      border
+      style="width: 95%"
+      ref="minthist"
+      highlight-current-row
+    >
+      <el-table-column type="index" width="50" />
+      <el-table-column prop="addr" label="Address" />
+      <el-table-column prop="sumval" label="Amount" width="250" />
+      <el-table-column prop="times" label="Times" width="100" />
     </el-table>
   </el-card>
 </template>
 <script>
 import { mapState } from "vuex";
-import { ethers } from 'ethers';
-
+import { ethers } from "ethers";
 
 export default {
   name: "MintTable",
   computed: mapState({
-    bsc: "bsc"
+    bsc: "bsc",
   }),
-  data(){
-      return {
-          minthist: [],
-          mtxs: {},
-          loading: false,
-          decimals: 0,
-          startBlk: 18267021,
-          endBlk: 18439821,
-          lastLoadBlk: 0,
-          userPos: 'Unknown'
-      }
+  data() {
+    return {
+      minthist: [],
+      mtxs: {},
+      loading: false,
+      decimals: 0,
+      startBlk: 18267021,
+      endBlk: 18439821,
+      lastLoadBlk: 0,
+      userPos: "Unknown",
+    };
   },
   methods: {
     load: async function () {
-      const ctr = this.bsc.ctrs.wxcc
+      const ctr = this.bsc.ctrs.wxcc;
       this.loading = true;
-      if(!this.decimals){
-          this.decimals = await ctr.decimals()
+      if (!this.decimals) {
+        this.decimals = await ctr.decimals();
       }
-      const mints = await this.load_mints(this.bsc.provider, ctr, this.startBlk, this.endBlk)
-      const minthist = []
-      for(var k in mints){
-        minthist.push(mints[k])
+      const mints = await this.load_mints(
+        this.bsc.provider,
+        ctr,
+        this.startBlk,
+        this.endBlk
+      );
+      const minthist = [];
+      for (var k in mints) {
+        minthist.push(mints[k]);
       }
-      minthist.sort(function(a,b){
-          if(a.amount.gt(b.amount)) return -1;
-          if(a.amount.lt(b.amount)) return 1;
-          return 0;
-      })
-      let crow = -1
-      for(let i in minthist){
-          if(minthist[i].addr==this.bsc.addr){
-              crow = i
-          }
-          minthist[i].sumval = ethers.utils.formatUnits(minthist[i].amount, this.decimals)
+      minthist.sort(function (a, b) {
+        if (a.amount.gt(b.amount)) return -1;
+        if (a.amount.lt(b.amount)) return 1;
+        return 0;
+      });
+      let crow = -1;
+      for (let i in minthist) {
+        if (minthist[i].addr == this.bsc.addr) {
+          crow = i;
+        }
+        minthist[i].sumval = ethers.utils.formatUnits(
+          minthist[i].amount,
+          this.decimals
+        );
       }
       this.minthist = minthist;
-      if(crow>=0){
-          this.$refs.minthist.setCurrentRow(minthist[crow])
-          this.userPos = parseInt(crow)+1
-      }else{
-          this.userPos = 'None'
+      if (crow >= 0) {
+        this.$refs.minthist.setCurrentRow(minthist[crow]);
+        this.userPos = parseInt(crow) + 1;
+      } else {
+        this.userPos = "None";
       }
       this.loading = false;
     },
-    load_mints: async function(provider, ctr, startblk, endblk){
-        const stepMax = 5000
-        const curblk = await provider.getBlockNumber()
-        if(!endblk || curblk<endblk){
-            endblk = curblk
-        }
-        let mints = {}
+    load_mints: async function (provider, ctr, startblk, endblk) {
+      const stepMax = 5000;
+      const curblk = await provider.getBlockNumber();
+      if (!endblk || curblk < endblk) {
+        endblk = curblk;
+      }
+      let mints = {};
 
-        let lstart = startblk
-        if(lstart<this.lastLoadBlk){
-            lstart = this.lastLoadBlk
+      let lstart = startblk;
+      if (lstart < this.lastLoadBlk) {
+        lstart = this.lastLoadBlk;
+      }
+      while (lstart < endblk) {
+        let lend = lstart + stepMax;
+        if (lend > endblk) {
+          lend = endblk;
         }
-        while(lstart<endblk){
-            let lend = lstart + stepMax
-            if(lend>endblk){
-                lend = endblk
-            }
-            const txs = await ctr.queryFilter('Transfer', lstart, lend)
-            this.lastLoadBlk = lend
-            for(let i in txs){
-                this.mtxs[txs[i].transactionHash] = txs[i]
-            }
-            lstart = lend
+        const txs = await ctr.queryFilter("Transfer", lstart, lend);
+        this.lastLoadBlk = lend;
+        for (let i in txs) {
+          this.mtxs[txs[i].transactionHash] = txs[i];
         }
-        for(let i in this.mtxs){
-            const tx = this.mtxs[i]
-            if(tx.args.from!=ethers.constants.AddressZero){
-                continue
-            }
-            const toaddr = tx.args.to
-            if(!(toaddr in mints)){
-                mints[toaddr] = {
-                    addr: toaddr,
-                    amount: ethers.BigNumber.from(0),
-                    times: 0
-                }
-            }
-            mints[toaddr].amount = mints[toaddr].amount.add(tx.args.value)
-            mints[toaddr].times++
+        lstart = lend;
+      }
+      for (let i in this.mtxs) {
+        const tx = this.mtxs[i];
+        if (tx.args.from != ethers.constants.AddressZero) {
+          continue;
         }
+        const toaddr = tx.args.to;
+        if (!(toaddr in mints)) {
+          mints[toaddr] = {
+            addr: toaddr,
+            amount: ethers.BigNumber.from(0),
+            times: 0,
+          };
+        }
+        mints[toaddr].amount = mints[toaddr].amount.add(tx.args.value);
+        mints[toaddr].times++;
+      }
 
-        return mints
-    }
+      return mints;
+    },
   },
 };
 </script>

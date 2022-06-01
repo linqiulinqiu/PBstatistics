@@ -60,6 +60,7 @@ export default {
         }
       } catch (e) {
         console.log("connect wallet err", e);
+        window.location.reload(true);
       }
     },
   },

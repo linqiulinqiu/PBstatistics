@@ -8,8 +8,8 @@
           :sm="{ span: 11, offset: 2 }"
           :xs="{ span: 14, offset: 1 }"
         >
-          <h1>Mint Summary</h1>
-          <p>A tool for token mint statistics</p>
+          <h1>Mint WXCC Summary</h1>
+          <p>A tool for WXCC token mint statistics</p>
         </el-col>
         <el-col
           :lg="{ span: 6, offset: 8 }"
@@ -47,6 +47,9 @@ export default {
 };
 </script>
 <style>
+.font {
+  font-family: monospace;
+}
 .home {
   min-width: 390px;
 }
