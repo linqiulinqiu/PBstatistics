@@ -62,14 +62,12 @@ export default {
       })
       let crow = -1
       for(let i in minthist){
-          console.log(minthist[i].addr, this.bsc.addr)
           if(minthist[i].addr==this.bsc.addr){
               crow = i
           }
           minthist[i].sumval = ethers.utils.formatUnits(minthist[i].amount, this.decimals)
       }
       this.minthist = minthist;
-      console.log('crow', crow)
       if(crow>=0){
           this.$refs.minthist.setCurrentRow(minthist[crow])
           this.userPos = parseInt(crow)+1
