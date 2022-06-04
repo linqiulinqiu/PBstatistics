@@ -1,8 +1,11 @@
 <template>
   <el-card id="mints">
     <div slot="header" class="clearfix">
-      <span>Mint Summary List</span>
-      <span>Block Range: {{ startBlk }} --- {{ endBlk }}</span>
+      <el-col :span='4'><h4>Mint Summary List</h4></el-col>
+      <el-col :span='16'>
+        <span>Block Range: {{ startBlk }} --- {{ endBlk }}</span>
+        <el-tag type='info'>End Block may be adjusted according to actual blocktime</el-tag>
+      </el-col>
     </div>
     <el-col :span="4">
       <el-button type="primary" v-loading="loading" v-if="bsc" @click="load"
@@ -18,6 +21,7 @@
     <el-table
       class="font"
       :data="minthist"
+      :row-class-name="tableRowClassName"
       strip
       border
       style="width: 95%"
@@ -25,9 +29,17 @@
       highlight-current-row
     >
       <el-table-column type="index" width="50" />
-      <el-table-column prop="addr" label="Address" />
+      <el-table-column label="Address">
+        <template slot-scope='scope'>
+            <a :href='scope.row.addrlink' target='_blank' class='buttonText'>{{scope.row.addr}}</a>
+        </template>
+      </el-table-column>
       <el-table-column prop="sumval" label="Amount" width="250" />
-      <el-table-column prop="times" label="Times" width="100" />
+      <el-table-column label="Times" width="100">
+        <template slot-scope='scope'>
+            <a :href='scope.row.timeslink' target='_blank' class='buttonText'>{{scope.row.times}}</a>
+        </template>
+      </el-table-column>
     </el-table>
   </el-card>
 </template>
@@ -53,6 +65,17 @@ export default {
     };
   },
   methods: {
+    tableRowClassName({row, rowIndex}){
+        if(rowIndex === 0){
+            return 'top-row'
+        }else if(rowIndex < 3){
+            return 'sec-row'
+        }else if(rowIndex < 10){
+            return 'top10-row'
+        }
+        if(!row) return false
+        return ''
+    },
     load: async function () {
       const ctr = this.bsc.ctrs.wxcc;
       this.loading = true;
@@ -79,6 +102,8 @@ export default {
         if (minthist[i].addr == this.bsc.addr) {
           crow = i;
         }
+        minthist[i].addrlink = `https://bscscan.com/address/${minthist[i].addr}`
+        minthist[i].timeslink = `https://bscscan.com/token/${ctr.address}?a=${minthist[i].addr}`
         minthist[i].sumval = ethers.utils.formatUnits(
           minthist[i].amount,
           this.decimals
@@ -86,7 +111,7 @@ export default {
       }
       this.minthist = minthist;
       if (crow >= 0) {
-        this.$refs.minthist.setCurrentRow(minthist[crow]);
+        this.$refs.minthist.setCurrentRow(this.minthist[crow]);
         this.userPos = parseInt(crow) + 1;
       } else {
         this.userPos = "None";
@@ -94,7 +119,7 @@ export default {
       this.loading = false;
     },
     load_mints: async function (provider, ctr, startblk, endblk) {
-      const stepMax = 5000;
+      const stepMax = 2000;
       const curblk = await provider.getBlockNumber();
       if (!endblk || curblk < endblk) {
         endblk = curblk;
@@ -140,23 +165,15 @@ export default {
 };
 </script>
 <style>
-#connect .el-button {
-  margin-top: 25px;
-  background-color: #38f2af;
-  color: #000000;
-  height: 40px;
-  text-align: center;
-  font-size: 14px;
-  cursor: pointer;
-  padding: 0px;
-  box-shadow: 0px 2px 2px 0px rgba(56, 242, 175, 0.08);
+.el-table .top-row {
+    background: #409EFF
 }
-#connect .baddr {
-  color: #38f2af;
-  width: 99%;
-  margin: 0 auto;
-  font-size: 16px;
-  display: inline-block;
-  margin: 0 auto;
+
+.el-table .sec-row {
+    background: #67C23A
+}
+
+.el-table .top10-row {
+    background: #909399
 }
 </style>
