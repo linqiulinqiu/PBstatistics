@@ -59,7 +59,7 @@ export default {
       loading: false,
       decimals: 0,
       startBlk: 18267021,
-      endBlk: 18439821,
+      endBlk: 18438725,
       lastLoadBlk: 0,
       userPos: "Unknown",
     };
