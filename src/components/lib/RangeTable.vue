@@ -96,49 +96,56 @@ export default {
       if (!this.decimals) {
         this.decimals = await ctr.decimals();
       }
-      const mints = await this.load_mints(
-        this.bsc.provider,
-        ctr,
-        this.startBlk,
-        this.endBlk
-      );
-      const minthist = [];
-      for (var k in mints) {
-        minthist.push(mints[k]);
-      }
-      minthist.sort(function (a, b) {
-        if (a.amount.gt(b.amount)) return -1;
-        if (a.amount.lt(b.amount)) return 1;
-        return 0;
-      });
-      let crow = -1;
-      for (let i in minthist) {
-        if (minthist[i].addr == this.bsc.addr) {
-          crow = i;
-        }
-        minthist[
-          i
-        ].addrlink = `https://bscscan.com/address/${minthist[i].addr}`;
-        minthist[
-          i
-        ].timeslink = `https://bscscan.com/token/${ctr.address}?a=${minthist[i].addr}`;
-        minthist[i].sumval = ethers.utils.formatUnits(
-          minthist[i].amount,
-          this.decimals
+      try {
+        const mints = await this.load_mints(
+          this.bsc.provider,
+          ctr,
+          this.startBlk,
+          this.endBlk
         );
+        console.log("11", mints);
+        const minthist = [];
+        for (var k in mints) {
+          minthist.push(mints[k]);
+        }
+        minthist.sort(function (a, b) {
+          if (a.amount.gt(b.amount)) return -1;
+          if (a.amount.lt(b.amount)) return 1;
+          return 0;
+        });
+        let crow = -1;
+        for (let i in minthist) {
+          if (minthist[i].addr == this.bsc.addr) {
+            crow = i;
+          }
+          minthist[
+            i
+          ].addrlink = `https://bscscan.com/address/${minthist[i].addr}`;
+          minthist[
+            i
+          ].timeslink = `https://bscscan.com/token/${ctr.address}?a=${minthist[i].addr}`;
+          minthist[i].sumval = ethers.utils.formatUnits(
+            minthist[i].amount,
+            this.decimals
+          );
+        }
+        this.minthist = minthist;
+        if (crow >= 0) {
+          this.$refs.minthist.setCurrentRow(this.minthist[crow]);
+          this.userPos = parseInt(crow) + 1;
+        } else {
+          this.userPos = "None";
+        }
+      } catch (error) {
+        console.log("load err", error);
       }
-      this.minthist = minthist;
-      if (crow >= 0) {
-        this.$refs.minthist.setCurrentRow(this.minthist[crow]);
-        this.userPos = parseInt(crow) + 1;
-      } else {
-        this.userPos = "None";
-      }
+
       this.loading = false;
     },
     load_mints: async function (provider, ctr, startblk, endblk) {
       const stepMax = 2000;
       const curblk = await provider.getBlockNumber();
+      console.log("curblk", curblk, typeof curblk);
       if (!endblk || curblk < endblk) {
         endblk = curblk;
       }
@@ -176,9 +183,30 @@ export default {
         mints[toaddr].amount = mints[toaddr].amount.add(tx.args.value);
         mints[toaddr].times++;
       }
-
+      console.log("mints", mints);
       return mints;
     },
   },
 };
 </script>
+<style>
+.el-table {
+  min-width: 500px;
+}
+.el-table .top-row {
+  background-color: #49ab3b8c !important;
+}
+.el-table .sec-row {
+  background-color: #6aa74c63 !important;
+}
+.el-table .top10-row {
+  background-color: #8394b657 !important;
+}
+a {
+  text-decoration: none;
+  color: #000000;
+}
+a:hover {
+  color: #668b66;
+}
+</style>

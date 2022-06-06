@@ -3,7 +3,7 @@
     <div slot="header" class="clearfix">
       <h4>Mint Summary List</h4>
     </div>
-    <range-table :bsc="bsc" :startBlk="'18267021'" :endBlk="'18438725'" />
+    <range-table :bsc="bsc" :startBlk="18267021" :endBlk="18438725" />
     <h5>Phases 2 and 3 have not yet begun.</h5>
   </el-card>
 </template>
