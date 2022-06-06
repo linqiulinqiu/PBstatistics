@@ -35,7 +35,7 @@
       :row-class-name="tableRowClassName"
       strip
       border
-      style="width: 95%"
+      style="width: 96%,text-aligin:center"
       ref="minthist"
       highlight-current-row
     >
