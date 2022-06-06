@@ -145,7 +145,6 @@ export default {
     load_mints: async function (provider, ctr, startblk, endblk) {
       const stepMax = 2000;
       const curblk = await provider.getBlockNumber();
-      console.log("curblk", curblk, typeof curblk);
       if (!endblk || curblk < endblk) {
         endblk = curblk;
       }
@@ -183,7 +182,6 @@ export default {
         mints[toaddr].amount = mints[toaddr].amount.add(tx.args.value);
         mints[toaddr].times++;
       }
-      console.log("mints", mints);
       return mints;
     },
   },
