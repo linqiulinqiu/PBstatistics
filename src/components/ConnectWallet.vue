@@ -2,7 +2,6 @@
   <el-col id="connect">
     <span v-if="bsc" style="color: #fff" class="baddr font">
       <el-tooltip effect="light" placement="bottom" :content="bsc.addr">
-        <!-- <span slot="content">{{ bsc.addr }}</span> -->
         <el-button class="font">
           {{ addr }}
         </el-button>

@@ -8,7 +8,7 @@
           :sm="{ span: 11, offset: 2 }"
           :xs="{ span: 14, offset: 1 }"
         >
-          <h1>Mint WXCC Summary</h1>
+          <h1>WXCC Mint Summary</h1>
           <p>A tool for WXCC token mint statistics</p>
         </el-col>
         <el-col
@@ -55,9 +55,8 @@ export default {
 }
 .details {
   text-align: center;
-  padding-top: 200px;
 }
 .home > .el-main {
-  margin-top: 50px;
+  margin-top: 10px;
 }
 </style>
