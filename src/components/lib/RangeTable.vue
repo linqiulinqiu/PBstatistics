@@ -103,7 +103,6 @@ export default {
           this.startBlk,
           this.endBlk
         );
-        console.log("11", mints);
         const minthist = [];
         for (var k in mints) {
           minthist.push(mints[k]);
