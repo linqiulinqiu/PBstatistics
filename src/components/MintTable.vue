@@ -5,7 +5,7 @@
     </div>
     <range-table :bsc="bsc" :startBlk="18267021" :endBlk="18438725" />
     <range-table :bsc="bsc" :startBlk="18524544" :endBlk="18724855" />
-    <h4>Phases 3 have not yet begun.</h4>
+    <range-table :bsc="bsc" :startBlk="18810791" :endBlk="19012391" />
   </el-card>
 </template>
 <script>
