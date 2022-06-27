@@ -5,7 +5,7 @@
     </div>
     <range-table :bsc="bsc" :startBlk="18267021" :endBlk="18438725" />
     <range-table :bsc="bsc" :startBlk="18524544" :endBlk="18724855" />
-    <range-table :bsc="bsc" :startBlk="18810791" :endBlk="19012391" />
+    <range-table :bsc="bsc" :startBlk="18810791" :endBlk="19011839" />
   </el-card>
 </template>
 <script>
